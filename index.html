@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Duck Side OF The Moon</title>
+  <meta name="description" content="Duck Side OF The Moon — Human Before Data" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="#home" class="brand">Duck Side <span>OF</span> The Moon</a>
+    <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
+    <nav>
+      <a href="#music">Musique</a>
+      <a href="#playlists">Playlists</a>
+      <a href="#lyrics">Lyrics</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="eyebrow">DUCKOFTHEMOON</div>
+        <h1>DUCK SIDE <span>OF</span> THE MOON</h1>
+        <p class="baseline">Human Before Data</p>
+        <div class="hero-actions">
+          <button class="primary" id="listenNow">▶ Écouter</button>
+          <a class="secondary" href="#playlists">Explorer</a>
+        </div>
+      </div>
+      <div class="scroll-hint">↓</div>
+    </section>
+
+    <section id="music" class="section shell">
+      <div class="section-heading">
+        <div>
+          <span class="kicker">LATEST FROM THE MOON</span>
+          <h2>Derniers titres</h2>
+        </div>
+        <input id="searchInput" class="search" type="search" placeholder="Rechercher un titre, un thème ou une ambiance…" />
+      </div>
+      <div id="trackGrid" class="track-grid"></div>
+      <div id="emptyState" class="empty-state hidden">
+        Aucun morceau publié pour le moment. La façade est prête ; les fichiers audio pourront être servis via l’API privée reliée à Google Drive.
+      </div>
+    </section>
+
+    <section id="playlists" class="section section-alt">
+      <div class="shell">
+        <span class="kicker">COLLECTIONS</span>
+        <h2>Playlists</h2>
+        <div id="playlistGrid" class="playlist-grid"></div>
+      </div>
+    </section>
+
+    <section id="lyrics" class="section shell lyrics-section">
+      <span class="kicker">WORDS</span>
+      <h2>Lyrics</h2>
+      <div class="lyrics-card">
+        <div class="moon-disc"></div>
+        <div>
+          <h3>Les paroles restent liées au morceau</h3>
+          <p>Lorsqu’un titre possède des lyrics publiés, ils apparaissent ici sans interrompre la lecture. Les prompts, tags et versions de travail restent privés côté administration.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section section-alt">
+      <div class="shell about-grid">
+        <div>
+          <span class="kicker">ABOUT</span>
+          <h2>Duck Side OF The Moon</h2>
+        </div>
+        <div class="about-copy">
+          <p>Un espace musical indépendant entre clair-obscur, narration, technologie et émotion humaine.</p>
+          <p>Suno peut rester un atelier de création. Ici, la bibliothèque, l’écoute et l’identité publique sont indépendantes de la plateforme de génération.</p>
+          <p class="signature">Human Before Data.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-row">
+      <span>© <span id="year"></span> Duck Side OF The Moon</span>
+      <span>Human Before Data</span>
+    </div>
+  </footer>
+
+  <div class="player" id="player">
+    <img id="playerCover" src="assets/duck-side-of-the-moon.jpg" alt="Pochette" />
+    <div class="player-meta">
+      <strong id="playerTitle">Aucun titre chargé</strong>
+      <span id="playerArtist">Duck Side OF The Moon</span>
+    </div>
+    <div class="player-controls">
+      <button id="prevBtn" aria-label="Titre précédent">⏮</button>
+      <button id="playBtn" class="play-main" aria-label="Lecture">▶</button>
+      <button id="nextBtn" aria-label="Titre suivant">⏭</button>
+    </div>
+    <div class="progress-wrap">
+      <span id="currentTime">0:00</span>
+      <input id="progress" type="range" min="0" max="100" value="0" />
+      <span id="duration">0:00</span>
+    </div>
+    <button id="muteBtn" class="mute" aria-label="Volume">🔊</button>
+    <audio id="audio" preload="metadata"></audio>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
