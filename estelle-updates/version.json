@@ -1,0 +1,17 @@
+{
+  "latest_version": "0.7.0",
+  "published_at": "2026-09-28",
+  "installer_parts": [
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.0.exe.part01",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.0.exe.part02",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.0.exe.part03",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.0.exe.part04"
+  ],
+  "sha256": "cfdbb47953c573144f991d5f248a955ab8b10eda65c866b80d3ff4e3bc23499c",
+  "notes": [
+    "Sauvegarde complète dans un fichier .estelle et restauration contrôlée.",
+    "Détection quotidienne des nouvelles versions avec notification non bloquante.",
+    "Mise à jour en un clic après vérification SHA-256 et sauvegarde de sécurité.",
+    "Bouton de vérification manuelle dans l’onglet Aide."
+  ]
+}
