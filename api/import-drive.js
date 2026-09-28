@@ -49,7 +49,8 @@ export default async function handler(req, res) {
   if (!googleAuth.startsWith('Bearer ')) return res.status(401).json({ error: 'Jeton Google absent' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-  const files = Array.isArray(body.files) ? body.files : [];
+  const legacyMode = !Array.isArray(body.files) && Boolean(body.fileId);
+  const files = Array.isArray(body.files) ? body.files : (legacyMode ? [{ id: body.fileId, name: body.name, mimeType: body.mimeType, size: body.size, createdAt: body.createdAt, modifiedAt: body.modifiedAt || body.createdAt }] : []);
   const republishRestored = body.republishRestored !== false;
 
   const audioFiles = files.filter(f => AUDIO_MIMES.has(f.mimeType) && Number(f.size || 0) <= MAX_BYTES);
@@ -145,7 +146,7 @@ export default async function handler(req, res) {
     track.updatedAt = now;
   }
 
-  for (const track of catalog.tracks) {
+  if (!legacyMode) for (const track of catalog.tracks) {
     if (track.driveFileId && !seenAudioIds.has(track.driveFileId) && track.status !== 'removed') {
       track.status = 'removed';
       track.published = false;
