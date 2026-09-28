@@ -1,4 +1,4 @@
-const S={secret:sessionStorage.getItem('duckAdminSecret')||'',catalog:null,coverTrackId:null};
+const S={secret:sessionStorage.getItem('duckAdminSecret')||'',catalog:null,coverTrackId:null,appUploadIndex:-1,appUploadButton:null};
 const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function headers(){return {'Content-Type':'application/json','X-Admin-Secret':S.secret}}
@@ -31,11 +31,81 @@ $('[data-aidx] input,[data-aidx] textarea').forEach(el=>el.addEventListener('cha
 $('[data-app-upload]').forEach(b=>b.onclick=()=>chooseApplicationFile(Number(b.dataset.appUpload),b));
 $('[data-app-delete]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.appDelete);if(confirm('Supprimer cette fiche application ?')){S.catalog.applications.splice(i,1);renderApplications()}});
 }
-function chooseApplicationFile(index,button){const input=document.createElement('input');input.type='file';input.accept='.exe,.msi,.zip,.7z,.rar,.dmg,.pkg,.deb,.rpm,.AppImage,.tar,.gz';input.onchange=()=>{const file=input.files&&input.files[0];if(file)uploadApplicationFile(index,file,button)};input.click()}
-async function uploadApplicationFile(index,file,button){const app=S.catalog.applications[index];if(!app)return;const old=button.textContent;button.disabled=true;button.textContent='Préparation…';try{const ticket=await api('/api/admin/app-upload-url',{method:'POST',body:JSON.stringify({appId:app.id,fileName:file.name,fileSize:file.size,contentType:file.type||'application/octet-stream'})});button.textContent='Envoi…';const r=await fetch(ticket.presignedUrl,{method:'PUT',body:file});if(!r.ok)throw new Error('Échec du téléversement : HTTP '+r.status);app.downloadUrl=ticket.publicUrl;app.fileName=file.name;app.fileSize=file.size;app.releaseDate=new Date().toISOString();button.textContent='Enregistrement…';await save()}catch(e){alert(e.message)}finally{button.disabled=false;button.textContent=old;renderApplications()}}
+function chooseApplicationFile(index,button){S.appUploadIndex=index;S.appUploadButton=button;const input=$('#appFile');input.value='';input.click()}
+async function uploadApplicationFile(index,file,button){
+  const app=S.catalog.applications[index];
+  if(!app)return;
+
+  const old=button?button.textContent:'Téléverser une version';
+
+  if(button){
+    button.disabled=true;
+    button.textContent='Préparation…';
+  }
+
+  try{
+    const ticket=await api('/api/admin/app-upload-url',{
+      method:'POST',
+      body:JSON.stringify({
+        appId:app.id,
+        fileName:file.name,
+        fileSize:file.size,
+        contentType:file.type||'application/octet-stream'
+      })
+    });
+
+    if(button)button.textContent='Envoi en cours…';
+
+    const r=await fetch(ticket.presignedUrl,{
+      method:'PUT',
+      body:file,
+      headers:{
+        'Content-Type':file.type||'application/octet-stream'
+      }
+    });
+
+    if(!r.ok){
+      const txt=await r.text().catch(()=> '');
+      throw new Error('Échec du téléversement : HTTP '+r.status+(txt?' — '+txt:''));
+    }
+
+    let uploaded={};
+    try{uploaded=await r.json()}catch(_){}
+
+    const publicUrl=
+      uploaded.url ||
+      uploaded.downloadUrl ||
+      ticket.presignedUrl.split('?')[0];
+
+    app.downloadUrl=publicUrl;
+    app.fileName=file.name;
+    app.fileSize=file.size;
+    app.releaseDate=new Date().toISOString();
+
+    if(button)button.textContent='Enregistrement…';
+
+    S.catalog=await api('/api/admin/catalog',{
+      method:'POST',
+      body:JSON.stringify({
+        expectedRevision:S.catalog.revision,
+        catalog:S.catalog
+      })
+    });
+
+    alert('Version téléversée avec succès.');
+    renderAll();
+  }catch(e){
+    alert(e.message||'Téléversement impossible');
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=old;
+    }
+  }
+}
 function renderSync(){const rows=S.catalog.tracks.map(t=>'<tr><td>'+esc(t.sourceName||t.title)+'</td><td>'+esc(t.driveFileId||'—')+'</td><td><span class="status '+(t.status==='removed'?'removed':'active')+'">'+esc(t.status||'active')+'</span></td><td>'+new Date(t.updatedAt||t.createdAt||Date.now()).toLocaleString('fr-FR')+'</td></tr>').join('');$('#tab-sync').innerHTML='<div class="heading"><div><h1>Synchronisation Drive</h1><p>État des fichiers détectés.</p></div></div><div class="notice">Drive est la source physique. Un fichier supprimé du dossier est automatiquement dépublié. Sa suppression définitive reste manuelle dans Morceaux.</div><div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Fichier source</th><th>ID Drive</th><th>État</th><th>Dernière mise à jour</th></tr></thead><tbody>'+rows+'</tbody></table></div>'}
 function renderSettings(){const s=S.catalog.settings;$('#tab-settings').innerHTML='<div class="heading"><div><h1>Paramètres</h1><p>Valeurs par défaut du site.</p></div></div><div class="form"><label>Titre du site<input data-setting="siteTitle" value="'+esc(s.siteTitle)+'"></label><label>Baseline<input data-setting="baseline" value="'+esc(s.baseline)+'"></label><label>Artiste par défaut<input data-setting="defaultArtist" value="'+esc(s.defaultArtist)+'"></label><label>Playlist par défaut<select data-setting="defaultPlaylistId">'+S.catalog.playlists.map(p=>'<option value="'+esc(p.id)+'" '+(p.id===s.defaultPlaylistId?'selected':'')+'>'+esc(p.name)+'</option>').join('')+'</select></label><label><input type="checkbox" data-setting="autoPublishNewTracks" '+(s.autoPublishNewTracks?'checked':'')+'> Publier automatiquement les nouveaux morceaux</label></div>';$$('[data-setting]').forEach(el=>el.addEventListener('change',e=>{const f=e.target.dataset.setting;S.catalog.settings[f]=e.target.type==='checkbox'?e.target.checked:e.target.value}))}
 async function uploadCover(file){if(!S.coverTrackId||!file)return;const reader=new FileReader();reader.onload=async()=>{const base64=String(reader.result).split(',')[1];try{await api('/api/admin/upload-cover',{method:'POST',body:JSON.stringify({trackId:S.coverTrackId,filename:file.name,contentType:file.type,dataBase64:base64})});await refresh()}catch(e){alert(e.message)}};reader.readAsDataURL(file)}
-$('#loginBtn').onclick=login;$('#secretInput').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#refreshBtn').onclick=refresh;$('#saveBtn').onclick=save;$('#coverFile').addEventListener('change',e=>uploadCover(e.target.files[0]));
+$('#loginBtn').onclick=login;$('#secretInput').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#refreshBtn').onclick=refresh;$('#saveBtn').onclick=save;$('#coverFile').addEventListener('change',e=>uploadCover(e.target.files[0]));$('#appFile').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(file&&S.appUploadIndex>=0)uploadApplicationFile(S.appUploadIndex,file,S.appUploadButton)});
 $$('aside button[data-tab]').forEach(b=>b.onclick=()=>{$$('aside button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.tab').forEach(x=>x.classList.remove('active'));$('#tab-'+b.dataset.tab).classList.add('active')});
 if(S.secret){$('#secretInput').value=S.secret;login()}
