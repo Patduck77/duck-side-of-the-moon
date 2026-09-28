@@ -4,6 +4,6 @@
   "type": "module",
   "dependencies": {
     "@vercel/blob": "^2.4.0",
-    "music-metadata": "^10.9.0"
+    "music-metadata": "^11.16.1"
   }
 }
