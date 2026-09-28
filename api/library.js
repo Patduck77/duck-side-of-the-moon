@@ -6,7 +6,7 @@ function titleFromPath(pathname) {
     .replace(/\.mp3$/i, '');
 
   // Retire l'identifiant Drive placé devant le titre
-  const match = name.match(/^[A-Za-z0-9_-]{20,}-([a-z0-9].*)$/i);
+  const match = name.match(/^[^-]+-(.+)$/);
   if (match) name = match[1];
 
   return name
