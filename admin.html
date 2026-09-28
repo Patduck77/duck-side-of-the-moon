@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Duck Side OF The Moon</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header class="admin-top">
+    <a href="/" class="admin-brand">Duck Side <span>OF</span> The Moon</a>
+    <div class="admin-actions"><button id="refreshBtn">Actualiser</button><button id="saveBtn" class="primary">Enregistrer</button></div>
+  </header>
+
+  <div id="login" class="login-screen">
+    <div class="login-card">
+      <h1>Administration</h1>
+      <p>Entre ton mot de passe administrateur. Il reste uniquement dans cette session du navigateur.</p>
+      <input id="secretInput" type="password" placeholder="Mot de passe admin" autocomplete="current-password" />
+      <button id="loginBtn" class="primary">Ouvrir le tableau de bord</button>
+      <div id="loginError" class="error"></div>
+    </div>
+  </div>
+
+  <div id="adminApp" class="admin-layout hidden">
+    <aside>
+      <button data-tab="dashboard" class="active">Tableau de bord</button>
+      <button data-tab="tracks">Morceaux</button>
+      <button data-tab="playlists">Playlists</button>
+      <button data-tab="sync">Synchronisation</button>
+      <button data-tab="settings">Paramètres</button>
+    </aside>
+    <main>
+      <section id="tab-dashboard" class="tab active"></section>
+      <section id="tab-tracks" class="tab"></section>
+      <section id="tab-playlists" class="tab"></section>
+      <section id="tab-sync" class="tab"></section>
+      <section id="tab-settings" class="tab"></section>
+    </main>
+  </div>
+  <input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+  <script src="admin.js"></script>
+</body>
+</html>
