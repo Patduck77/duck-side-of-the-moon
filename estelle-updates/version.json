@@ -1,18 +1,29 @@
 {
-  "latest_version": "0.7.1",
-  "published_at": "2026-09-28",
+  "latest_version": "0.7.2",
+  "published_at": "2026-09-29",
   "installer_parts": [
-    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.1.exe.part01",
-    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.1.exe.part02",
-    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.1.exe.part03",
-    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.1.exe.part04"
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part01",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part02",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part03",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part04",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part05",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part06",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part07",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part08",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part09",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part10",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part11",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part12",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part13",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part14",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part15",
+    "https://raw.githubusercontent.com/Patduck77/duck-side-of-the-moon/main/estelle-updates/INSTALLER-ESTELLE-V0.7.2.exe.part16"
   ],
-  "sha256": "507e85958a143711743410377d8de210a671cd8586ec02983b48451f44ce4688",
+  "sha256": "d4c87bb3489297820888a98194c355eb3fe238435057e02a68bec923be731be8",
   "notes": [
-    "Nouveau logo φ, symbole du nombre d’or, dans l’application et la barre des tâches.",
-    "Sauvegarde complète dans un fichier .estelle et restauration contrôlée.",
-    "Détection quotidienne des nouvelles versions avec notification non bloquante.",
-    "Mise à jour en un clic après vérification SHA-256 et sauvegarde de sécurité.",
-    "Bouton de vérification manuelle dans l’onglet Aide."
+    "Nouveau bouton pour quitter proprement les données fictives et commencer la configuration réelle.",
+    "Sauvegarde automatique avant le retrait du jeu de démonstration.",
+    "Ouverture immédiate de la création de la première classe, puis import possible des élèves depuis PRONOTE.",
+    "Correction du blocage de la page Orientation lorsque certaines rubriques du catalogue sont absentes."
   ]
 }
