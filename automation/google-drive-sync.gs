@@ -3,7 +3,14 @@ const CONFIG = {
   MAX_ITEMS: 500
 };
 
-function syncMusic() {
+function syncMusic(event) {
+  // Les déclencheurs installables transmettent un événement : aucun import automatique.
+  if (event) {
+    disableAutoSync();
+    console.log('Synchronisation automatique désactivée. Lance syncMusic manuellement.');
+    return;
+  }
+
   const props = PropertiesService.getScriptProperties();
   const importUrl = props.getProperty('VERCEL_IMPORT_URL');
   const ingestSecret = props.getProperty('INGEST_SECRET');
@@ -36,7 +43,7 @@ function syncMusic() {
       'X-Ingest-Secret': ingestSecret,
       'Authorization': 'Bearer ' + ScriptApp.getOAuthToken()
     },
-    payload: JSON.stringify({ files, republishRestored: true }),
+    payload: JSON.stringify({ files, republishRestored: true, manualSync: true }),
     muteHttpExceptions: true
   });
 
@@ -46,11 +53,14 @@ function syncMusic() {
   if (code < 200 || code >= 300) throw new Error(body);
 }
 
-function installTrigger() {
+// Supprime uniquement les déclencheurs de synchronisation de l'utilisateur courant.
+function disableAutoSync() {
   ScriptApp.getProjectTriggers()
-    .filter(t => t.getHandlerFunction() === 'syncMusic')
+    .filter(t => ['syncMusic', 'testSync', 'installTrigger'].includes(t.getHandlerFunction()))
     .forEach(t => ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger('syncMusic').timeBased().everyMinutes(1).create();
 }
 
-function testSync() { syncMusic(); }
+// Compatibilité : cet ancien point d'entrée désactive désormais la planification.
+function installTrigger() { disableAutoSync(); }
+
+function testSync(event) { syncMusic(event); }

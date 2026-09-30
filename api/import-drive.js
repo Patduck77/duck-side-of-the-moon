@@ -94,6 +94,10 @@ export default async function handler(req, res) {
   if (!auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Jeton Google absent' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+  // Bloque l'ancien script planifié avant toute opération Drive ou Blob.
+  if (body.manualSync !== true) {
+    return res.status(403).json({ error: 'Synchronisation automatique désactivée. Utilise le script de synchronisation manuelle à jour.' });
+  }
   const legacy = !Array.isArray(body.files) && Boolean(body.fileId);
 
   const files = Array.isArray(body.files) ? body.files : (legacy ? [{
