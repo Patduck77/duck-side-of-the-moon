@@ -11,6 +11,12 @@ function syncMusic(event) {
     return;
   }
 
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(1000)) throw new Error('Une synchronisation est déjà en cours.');
+  try { return runManualSync_(); } finally { lock.releaseLock(); }
+}
+
+function runManualSync_() {
   const props = PropertiesService.getScriptProperties();
   const importUrl = props.getProperty('VERCEL_IMPORT_URL');
   const ingestSecret = props.getProperty('INGEST_SECRET');
@@ -36,6 +42,8 @@ function syncMusic(event) {
     count++;
   }
 
+  if (it.hasNext()) throw new Error('Le dossier dépasse 500 fichiers pris en charge. Synchronisation annulée pour éviter une dépublication incorrecte.');
+
   const response = UrlFetchApp.fetch(importUrl, {
     method: 'post',
     contentType: 'application/json',
@@ -50,7 +58,10 @@ function syncMusic(event) {
   const code = response.getResponseCode();
   const body = response.getContentText();
   console.log('HTTP ' + code + ' — ' + body);
-  if (code < 200 || code >= 300) throw new Error(body);
+  if (code < 200 || code >= 300) throw new Error('Import impossible : HTTP ' + code);
+  const result = JSON.parse(body);
+  if (result.ok !== true) throw new Error('Résultat de synchronisation invalide.');
+  return result;
 }
 
 // Supprime uniquement les déclencheurs de synchronisation de l'utilisateur courant.
@@ -64,3 +75,20 @@ function disableAutoSync() {
 function installTrigger() { disableAutoSync(); }
 
 function testSync(event) { syncMusic(event); }
+
+// Appelé uniquement par le serveur admin, jamais par un déclencheur.
+function doPost(event) {
+  let output;
+  try {
+    const body = JSON.parse(event.postData.contents);
+    const expected = PropertiesService.getScriptProperties().getProperty('INGEST_SECRET');
+    if (!expected || body.secret !== expected || body.action !== 'sync') {
+      output = { ok: false, error: 'Accès refusé.' };
+    } else {
+      output = syncMusic();
+    }
+  } catch (error) {
+    output = { ok: false, error: 'Synchronisation impossible. Vérifie les exécutions Google Apps Script.' };
+  }
+  return ContentService.createTextOutput(JSON.stringify(output)).setMimeType(ContentService.MimeType.JSON);
+}

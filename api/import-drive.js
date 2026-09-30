@@ -176,7 +176,6 @@ export default async function handler(req, res) {
     track.sourceName = file.name;
     track.sourceTitle = sourceTitle;
     track.sourceBaseKey = key;
-    track.sourceModifiedAt = file.modifiedAt;
     if (!track.titleLocked) track.title = sourceTitle;
 
     if (changed && imported < MAX_IMPORTS) {
@@ -188,6 +187,7 @@ export default async function handler(req, res) {
       );
       track.audio = blob.url;
       track.audioPath = blob.pathname;
+      track.sourceModifiedAt = file.modifiedAt;
       imported++;
     }
 
@@ -272,6 +272,10 @@ export default async function handler(req, res) {
     revision: catalog.revision,
     detectedAudio: audioFiles.length,
     detectedImages: imageFiles.length,
+    remainingAudio: audioFiles.filter(file => {
+      const track = catalog.tracks.find(t => t.driveFileId === file.id);
+      return !track?.audio || track.sourceModifiedAt !== file.modifiedAt;
+    }).length,
     imported,
     covers,
     embeddedCovers,

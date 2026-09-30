@@ -39,3 +39,14 @@ Synchronisation manuelle uniquement
 - L'API refuse les appels de l'ancien script sans manualSync: true avant tout accès Blob.
 - Une exécution importe au maximum 4 fichiers audio et analyse au maximum 1 pochette intégrée ; relancer manuellement si nécessaire.
 - Modifier ce dépôt ne met pas à jour la copie Google Apps Script. Le blocage côté API prend effet uniquement après déploiement réussi sur Vercel.
+
+Bouton de synchronisation dans l'administration
+1. Remplacer Code.gs dans Duck Side Sync par automation/google-drive-sync.gs et enregistrer.
+2. Exécuter disableAutoSync depuis chaque compte ayant créé un ancien déclencheur.
+3. Conserver les propriétés INGEST_SECRET et VERCEL_IMPORT_URL (https://duck-side-of-the-moon.vercel.app/api/import-drive).
+4. Déployer le script comme Application Web : exécuter en tant que propriétaire, accès Tout le monde pour l'appel serveur. Le doPost refuse tout appel sans le secret partagé INGEST_SECRET. Pour un déploiement existant, publier une nouvelle version.
+5. Ajouter GOOGLE_DRIVE_SYNC_URL dans les variables serveur Vercel de Production : URL Google du déploiement terminée par /exec (pas /dev). Ne pas placer le secret dans cette URL. INGEST_SECRET doit correspondre entre Vercel et Google.
+6. Après levée de la suspension Vercel, déployer le dernier commit avec ces variables.
+7. Ouvrir /admin.html → Synchronisation → Synchroniser maintenant. Enregistrer d'abord les modifications en cours. Un clic lance un seul lot ; le résultat indique les audio restants à importer. Aucun déclencheur, boucle ou intervalle n'est créé.
+Le jeton OAuth Drive reste entre Google Apps Script et le serveur d'import ; il n'est jamais envoyé au navigateur.
+En cas de dépassement du délai, attendre puis actualiser avant de relancer : le script peut encore finir. Le verrou Google empêche deux synchronisations simultanées.
