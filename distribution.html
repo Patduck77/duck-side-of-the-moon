@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distribution — Duck Side OF The Moon</title><link rel="stylesheet" href="admin.css"><link rel="stylesheet" href="distribution.css"></head>
+<body><header class="admin-top"><a class="admin-brand" href="admin.html">← Administration</a><strong>Distribution · bêta</strong></header>
+<main class="distribution"><h1>Préparer une sortie pour Ditto</h1>
+<p>La préparation ne soumet aucun morceau. La saisie et la publication dans Ditto restent sous le contrôle de Patrick.</p>
+<form id="login"><label>Mot de passe administrateur <input id="secret" type="password" autocomplete="current-password" required></label><button>Ouvrir</button></form>
+<p id="message" role="status" aria-live="polite"></p>
+<div id="workspace" hidden><div class="toolbar"><button id="refresh">Actualiser</button><a href="https://dittomusic.com/" target="_blank" rel="noopener noreferrer">Continuer dans Ditto ↗</a></div>
+<details><summary>Profil artiste et valeurs par défaut</summary><form id="profile"></form><p>Les valeurs du profil sont copiées lors de la création d’une fiche. Les fiches existantes conservent leurs crédits.</p></details>
+<label>Chanson<select id="track"></select></label><button id="create">Créer la fiche avec les valeurs par défaut</button>
+<div id="release"></div><details><summary>Journal d’audit</summary><pre id="audit"></pre></details>
+</div></main><script type="module" src="distribution.js"></script></body></html>
