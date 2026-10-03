@@ -2,8 +2,16 @@
   "name": "duck-side-of-the-moon",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node scripts/check.mjs"
+  },
   "dependencies": {
-    "@vercel/blob": "^2.4.0",
+    "@vercel/blob": "^2.8.0",
+    "fflate": "^0.8.2",
     "music-metadata": "^11.16.1"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
   }
 }
