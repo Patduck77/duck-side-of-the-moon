@@ -24,7 +24,10 @@ $('#addPlaylist').onclick=()=>{const name=prompt('Nom de la playlist');if(!name)
 $$('[data-pidx] input,[data-pidx] textarea').forEach(el=>el.addEventListener('change',e=>{const card=e.target.closest('[data-pidx]');const p=S.catalog.playlists[Number(card.dataset.pidx)];const f=e.target.dataset.pfield;if(!f)return;p[f]=e.target.type==='checkbox'?e.target.checked:e.target.value}));
 $$('[data-pdelete]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.pdelete);const id=S.catalog.playlists[i].id;if(confirm('Supprimer cette playlist ? Les morceaux restent publiés.')){S.catalog.playlists.splice(i,1);S.catalog.tracks.forEach(t=>t.playlistIds=(t.playlistIds||[]).filter(x=>x!==id));renderPlaylists();renderTracks()}})}
 function formatBytes(n){n=Number(n||0);if(!n)return '—';const u=['o','Ko','Mo','Go'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return (i?n.toFixed(n<10?1:0):Math.round(n))+' '+u[i]}
-function renderApplications(){const apps=S.catalog.applications||[];const cards=apps.map((a,i)=>'<div class="playlist-edit" data-aidx="'+i+'"><h3>'+esc(a.name||'Application')+'</h3><div class="form"><label>Nom<input data-afield="name" value="'+esc(a.name||'')+'"></label><label>Accroche<input data-afield="tagline" value="'+esc(a.tagline||'')+'"></label><label>Description<textarea data-afield="description">'+esc(a.description||'')+'</textarea></label><div class="row"><label>Version<input data-afield="version" value="'+esc(a.version||'')+'"></label><label>Plateforme<input data-afield="platform" value="'+esc(a.platform||'Windows')+'"></label></div><label>Notes de version<textarea data-afield="notes">'+esc(a.notes||'')+'</textarea></label><div class="notice"><strong>Fichier :</strong> '+esc(a.fileName||'aucun')+' · '+formatBytes(a.fileSize)+'<br><span class="small">'+(a.downloadUrl?'<a href="'+esc(a.downloadUrl)+'" target="_blank">Tester le téléchargement</a>':'Aucun fichier hébergé')+'</span></div><div class="row"><label><input type="checkbox" data-afield="published" '+(a.published!==false?'checked':'')+'> Publique</label><label><input type="checkbox" data-afield="featured" '+(a.featured?'checked':'')+'> Mise en avant</label></div><button data-app-upload="'+i+'" class="primary">Téléverser une version</button><button data-app-delete="'+i+'" class="danger">Supprimer la fiche</button></div></div>').join('');
+const APPLICATION_FORMATS={zip:'Archive ZIP',exe:'Installateur Windows',msi:'Package Windows',dmg:'Image disque macOS',pkg:'Installateur macOS','7z':'Archive 7z',rar:'Archive RAR',deb:'Package Debian',rpm:'Package RPM',appimage:'Application Linux',tar:'Archive TAR',gz:'Archive GZ'};
+function applicationFormat(name){const ext=String(name||'').split('.').pop().toLowerCase();return APPLICATION_FORMATS[ext]||'Format non identifié'}
+function applicationMime(file){const ext=String(file.name||'').split('.').pop().toLowerCase();return ({zip:'application/zip',exe:'application/octet-stream',msi:'application/octet-stream',dmg:'application/octet-stream',pkg:'application/octet-stream','7z':'application/x-7z-compressed',rar:'application/vnd.rar',deb:'application/vnd.debian.binary-package',rpm:'application/x-rpm',appimage:'application/octet-stream',tar:'application/x-tar',gz:'application/gzip'})[ext]||file.type||'application/octet-stream'}
+function renderApplications(){const apps=S.catalog.applications||[];const cards=apps.map((a,i)=>'<div class="playlist-edit" data-aidx="'+i+'"><h3>'+esc(a.name||'Application')+'</h3><div class="form"><label>Nom<input data-afield="name" value="'+esc(a.name||'')+'"></label><label>Accroche<input data-afield="tagline" value="'+esc(a.tagline||'')+'"></label><label>Description<textarea data-afield="description">'+esc(a.description||'')+'</textarea></label><div class="row"><label>Version<input data-afield="version" value="'+esc(a.version||'')+'"></label><label>Plateforme<input data-afield="platform" value="'+esc(a.platform||'Windows')+'"></label></div><label>Notes de version<textarea data-afield="notes">'+esc(a.notes||'')+'</textarea></label><div class="notice"><strong>Fichier :</strong> '+esc(a.fileName||'aucun')+' · '+formatBytes(a.fileSize)+' · '+esc(applicationFormat(a.fileName))+'<br><span class="small">'+(a.downloadUrl?'<a href="'+esc(a.downloadUrl)+'" target="_blank">Tester le téléchargement</a>':'Aucun fichier hébergé')+'</span></div><div class="row"><label><input type="checkbox" data-afield="published" '+(a.published!==false?'checked':'')+'> Publique</label><label><input type="checkbox" data-afield="featured" '+(a.featured?'checked':'')+'> Mise en avant</label></div><button data-app-upload="'+i+'" class="primary">Téléverser une version</button><button data-app-delete="'+i+'" class="danger">Supprimer la fiche</button></div></div>').join('');
 $('#tab-applications').innerHTML='<div class="heading"><div><h1>Applications</h1><p>Héberge et publie HarpaGO, ESTELLE et tes futures applications.</p></div><button id="addApplication">+ Nouvelle application</button></div><div class="playlist-list">'+cards+'</div>';
 $('#addApplication').onclick=()=>{const name=prompt('Nom de l\'application');if(!name)return;const id=name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');S.catalog.applications=S.catalog.applications||[];S.catalog.applications.push({id,name,tagline:'',description:'',version:'',platform:'Windows',published:true,featured:false,downloadUrl:'',fileName:'',fileSize:0,releaseDate:'',icon:'',notes:''});renderApplications()};
 $$('[data-aidx] input,[data-aidx] textarea').forEach(el=>el.addEventListener('change',e=>{const card=e.target.closest('[data-aidx]');const a=S.catalog.applications[Number(card.dataset.aidx)];const f=e.target.dataset.afield;if(!f)return;a[f]=e.target.type==='checkbox'?e.target.checked:e.target.value}));
@@ -36,6 +39,8 @@ async function uploadApplicationFile(index,file,button){
   const app=S.catalog.applications[index];
   if(!app)return;
 
+  if(!Object.prototype.hasOwnProperty.call(APPLICATION_FORMATS,String(file.name).split('.').pop().toLowerCase())){alert('Format de fichier non autorisé');return}
+  const contentType=applicationMime(file);
   const old=button?button.textContent:'Téléverser une version';
 
   if(button){
@@ -50,7 +55,7 @@ async function uploadApplicationFile(index,file,button){
         appId:app.id,
         fileName:file.name,
         fileSize:file.size,
-        contentType:file.type||'application/octet-stream'
+        contentType
       })
     });
 
@@ -60,7 +65,7 @@ async function uploadApplicationFile(index,file,button){
       method:'PUT',
       body:file,
       headers:{
-        'Content-Type':file.type||'application/octet-stream'
+        'Content-Type':contentType
       }
     });
 
@@ -81,6 +86,7 @@ async function uploadApplicationFile(index,file,button){
     app.fileName=file.name;
     app.fileSize=file.size;
     app.releaseDate=new Date().toISOString();
+    app.fileFormat=applicationFormat(file.name);
 
     if(button)button.textContent='Enregistrement…';
 
@@ -92,7 +98,7 @@ async function uploadApplicationFile(index,file,button){
       })
     });
 
-    alert('Version téléversée avec succès.');
+    alert('Version '+applicationFormat(file.name)+' téléversée avec succès. Vérifie le lien de téléchargement avant publication.');
     renderAll();
   }catch(e){
     alert(e.message||'Téléversement impossible');
